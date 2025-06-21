@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import recipes from './recipes.json';
 
 // Typing Animation Component
 function TypingAnimation({ text, onComplete }) {
@@ -38,6 +37,7 @@ function Chatbot() {
   const [isLoading, setIsLoading] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef(null);
+  const recipesRef = useRef(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -100,6 +100,17 @@ function Chatbot() {
 
     // Add a 5-second delay to simulate response time
     await new Promise(resolve => setTimeout(resolve, 5000));
+
+    if (!recipesRef.current) {
+      try {
+        const response = await fetch('/recipes.json');
+        recipesRef.current = await response.json();
+      } catch (error) {
+        console.error('Error fetching recipes:', error);
+        // We can proceed without local recipes, backend will be called.
+      }
+    }
+    const recipes = recipesRef.current || [];
 
     // Check recipes.json for a similar question
     const userQuestion = userMessage.text.toLowerCase();
