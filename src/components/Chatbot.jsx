@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import recipes from './recipes.json';
 
 // Typing Animation Component
 function TypingAnimation({ text, onComplete }) {
@@ -97,6 +98,41 @@ function Chatbot() {
     ]);
     setIsTyping(true);
 
+    // Add a 5-second delay to simulate response time
+    await new Promise(resolve => setTimeout(resolve, 5000));
+
+    // Check recipes.json for a similar question
+    const userQuestion = userMessage.text.toLowerCase();
+    let foundAnswer = null;
+    for (const recipe of recipes) {
+      if (recipe.qa_pairs) {
+        const foundQaPair = recipe.qa_pairs.find(qa =>
+          qa.question && qa.question.toLowerCase().includes(userQuestion)
+        );
+        if (foundQaPair) {
+          foundAnswer = foundQaPair.answer;
+          break;
+        }
+      }
+    }
+
+    if (foundAnswer) {
+      const aiText = foundAnswer;
+      // Remove the placeholder and add the real AI message with typing animation
+      setMessages(prev => [
+        ...prev.filter(msg => !msg.isTyping),
+        {
+          id: Date.now() + 2,
+          text: aiText,
+          sender: 'ai',
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          isTyping: true
+        }
+      ]);
+      setIsLoading(false);
+      return; // Found in local JSON, so we don't call backend.
+    }
+
     // If not found, proceed to backend
     try {
       const response = await fetch('http://localhost:8000/predict', {
@@ -176,18 +212,6 @@ function Chatbot() {
         </div>
         <div className="flex-1 overflow-y-auto p-4 space-y-2">
           {/* Placeholder Chat Items */}
-          <div className="text-gray-300 hover:text-white cursor-pointer p-2 rounded-md hover:bg-gray-800">
-            Today's Recipe Ideas
-          </div>
-          <div className="text-gray-300 hover:text-white cursor-pointer p-2 rounded-md hover:bg-gray-800">
-            Meal Planning Help
-          </div>
-          <div className="text-gray-300 hover:text-white cursor-pointer p-2 rounded-md hover:bg-gray-800">
-            Cooking Tips
-          </div>
-          <div className="text-gray-300 hover:text-white cursor-pointer p-2 rounded-md hover:bg-gray-800">
-            Ingredient Substitutions
-          </div>
         </div>
       </div>
 
@@ -252,35 +276,6 @@ function Chatbot() {
                 </div>
               )}
 
-              {/* Prompt Buttons */}
-              <div className="w-full max-w-3xl">
-                <div className="grid grid-cols-2 gap-4 mb-8">
-                  <button 
-                    onClick={() => handlePromptClick("Suggest recipes for dinner tonight")}
-                    className="bg-gray-800 text-white py-3 px-6 rounded-lg hover:bg-gray-700 transition-colors duration-300"
-                  >
-                    Suggest recipes for dinner tonight
-                  </button>
-                  <button 
-                    onClick={() => handlePromptClick("Help me plan meals for the week")}
-                    className="bg-gray-800 text-white py-3 px-6 rounded-lg hover:bg-gray-700 transition-colors duration-300"
-                  >
-                    Help me plan meals for the week
-                  </button>
-                  <button 
-                    onClick={() => handlePromptClick("Find ingredient substitutions")}
-                    className="bg-gray-800 text-white py-3 px-6 rounded-lg hover:bg-gray-700 transition-colors duration-300"
-                  >
-                    Find ingredient substitutions
-                  </button>
-                  <button 
-                    onClick={() => handlePromptClick("Give me cooking tips")}
-                    className="bg-gray-800 text-white py-3 px-6 rounded-lg hover:bg-gray-700 transition-colors duration-300"
-                  >
-                    Give me cooking tips
-                  </button>
-                </div>
-              </div>
             </div>
           ) : (
             // Chat messages

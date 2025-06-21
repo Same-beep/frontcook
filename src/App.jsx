@@ -14,7 +14,7 @@ function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex items-center">
-              <span className="text-2xl font-bold text-green-500 transition-colors duration-300 hover:text-green-400">FrontCook</span>
+              <span className="text-2xl font-bold text-green-500 transition-colors duration-300 hover:text-green-400">RecipeAI</span>
             </div>
             <div className="hidden md:flex items-center space-x-8">
               <a href="#features" className="text-gray-300 hover:text-green-500 transition-colors duration-300">Features</a>
