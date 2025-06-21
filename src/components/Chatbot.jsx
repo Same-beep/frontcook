@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import recipesData from './recipes.json';
 
 // Typing Animation Component
 function TypingAnimation({ text, onComplete }) {
@@ -97,37 +96,6 @@ function Chatbot() {
       }
     ]);
     setIsTyping(true);
-
-    // Check recipes.json for a matching question
-    let foundAnswer = null;
-    for (const recipe of recipesData) {
-      for (const pair of recipe.qa_pairs) {
-        if (pair.question.trim().toLowerCase() === userMessage.text.trim().toLowerCase()) {
-          foundAnswer = pair.answer;
-          break;
-        }
-      }
-      if (foundAnswer) break;
-    }
-
-    if (foundAnswer) {
-      // Simulate a 5 second delay before showing the answer
-      setTimeout(() => {
-        setMessages(prev => [
-          ...prev.filter(msg => !msg.isTyping),
-          {
-            id: Date.now() + 2,
-            text: foundAnswer,
-            sender: 'ai',
-            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            isTyping: true
-          }
-        ]);
-        setIsLoading(false);
-        setIsTyping(false);
-      }, 5000);
-      return;
-    }
 
     // If not found, proceed to backend
     try {
